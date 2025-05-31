@@ -13,13 +13,7 @@ pip install numpy scipy scikit-image matplotlib opencv-python
 ### rl (Richardson–Lucy 演算法)
 ```
 cd project/src
-python main.py \
-  -i data/case1.jpg \
-  -o results \
-  -m rl \
-  --psf_size 5 \
-  --psf_sigma 1.0 \
-  --iterations 30
+python main.py -i data/case1.jpg -o results -m rl --psf_size 5 --psf_sigma 1.0 --iterations 30
 ```
 - -i data/case1.jpg
     輸入模糊影像路徑，這裡指向 src/data/ 下的 case1.jpg。
@@ -42,13 +36,7 @@ python main.py \
 ### wiener (Wiener Filter)
 ```
 cd src
-python main.py \
-  -i data/case2.png \
-  -o results \
-  -m wiener \
-  --psf_size 7 \
-  --psf_sigma 1.5 \
-  --K 0.02
+python main.py -i data/case2.png -o results -m wiener --psf_size 7 --psf_sigma 1.5 --K 0.02
 ```
 - -m wiener
 使用 Wiener Filter 去模糊。
