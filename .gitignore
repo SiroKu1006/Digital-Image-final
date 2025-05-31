@@ -2,3 +2,5 @@
 .vscode/
 *.pdf
 *.pptx
+venv/
+Restormer/
