@@ -1,13 +1,30 @@
-
-
-
-
-##初始化
-```
+## 初始化
+```bash
 python -m venv venv
 venv\Scripts\activate
-pip install numpy scipy scikit-image matplotlib opencv-python
+pip install numpy scipy scikit-image matplotlib opencv-python einops
 ```
+
+# Restormer 設置
+```bash
+pip install basicsr timm gdown
+pip install torchvision==0.17.0   # 降版本
+```
+
+到 venv\Lib\site-packages\basicsr\data\degradations.py 把第 8 行從
+
+```bash
+from torchvision.transforms.functional_tensor import rgb_to_grayscale
+```
+
+改成
+
+```bash
+from torchvision.transforms._functional_tensor import rgb_to_grayscale
+```
+
+接著到 <a href="https://drive.google.com/file/d/10v8BH3Gktl34TYzPy0x-pAKoRSYKnNZp/view?usp=drive_link">LINK</a>
+下載，並放到 src/.cache/restormer，並去 deblur_restormer.py 改第 17 行檔案路徑。
 
 ## 執行
 ### rl (Richardson–Lucy 演算法)
@@ -36,10 +53,20 @@ python main.py -i data/case1.jpg -o results -m rl --psf_size 5 --psf_sigma 1.0 -
 ### wiener (Wiener Filter)
 ```
 cd src
-python main.py -i data/case2.png -o results -m wiener --psf_size 7 --psf_sigma 1.5 --K 0.02
+python main.py -i data/case2.jpg -o results -m wiener --psf_size 7 --psf_sigma 1.5 --K 0.02
 ```
+
 - -m wiener
 使用 Wiener Filter 去模糊。
 
 - --K 0.02
 Wiener Filter 的雜訊功率比 (noise-to-signal ratio)，通常介於 0.001～0.1，K 值越小，去模糊越強，但雜訊鬆弛 (ringing) 現象也會越明顯；K 值越大，則去模糊效果較弱。
+
+### Restormer
+```bash
+python main.py -i data/case4.jpg -o results -m restormer --resize 512
+```
+
+
+## 使用第三方模型
+本專案整合 [Restormer](https://github.com/swz30/Restormer) 模型進行影像去模糊處理，其模型架構 `restormer_arch.py` 與預訓練權重 `single_image_defocus_deblurring.pth`

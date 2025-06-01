@@ -13,8 +13,11 @@ def deblur_rl(img, psf, iterations=30):
     回傳:
         numpy.ndarray: 去模糊後的影像 (float, 範圍 0~1)
     """
-    # 因為 skimage.restoration.richardson_lucy 的參數名稱是 num_iter
-    deblurred = richardson_lucy(img, psf, num_iter=iterations)
-    # 確保輸出值在 [0, 1] 範圍內
-    deblurred = np.clip(deblurred, 0, 1)
-    return deblurred
+    if img.ndim == 3:
+        channels = []
+        for c in range(3):
+            channel = richardson_lucy(img[..., c], psf, num_iter=iterations)
+            channels.append(np.clip(channel, 0, 1))
+        return np.stack(channels, axis=-1)
+    else:
+        return np.clip(richardson_lucy(img, psf, num_iter=iterations), 0, 1)

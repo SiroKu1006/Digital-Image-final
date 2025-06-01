@@ -3,9 +3,10 @@
 import os
 import argparse
 import numpy as np
-from utils import load_image, save_image, generate_gaussian_psf
+from utils import load_image, save_image, generate_gaussian_psf, resize_and_crop_to_multiple_of_8
 from deblur_wiener import deblur_wiener
 from deblur_rl import deblur_rl
+from deblur_restormer import deblur_restormer
 from postprocess import denoise, enhance_edges
 from metrics import compute_psnr, compute_ssim
 
@@ -20,8 +21,8 @@ def parse_args():
         help="輸出結果資料夾 (預設: data/results)"
     )
     parser.add_argument(
-        "-m", "--method", type=str, choices=["wiener", "rl"], default="rl",
-        help="去模糊方法: 'wiener' (Wiener Filter) 或 'rl' (Richardson-Lucy)，預設 'rl'"
+        "-m", "--method", type=str, choices=["wiener", "rl", "restormer"], default="rl",
+        help="去模糊方法: 'wiener' (Wiener Filter)、'rl' (Richardson-Lucy)、或 'restormer' (Transformer-based)，預設 'rl'"
     )
     parser.add_argument(
         "--psf_size", type=int, default=5,
@@ -79,6 +80,10 @@ def parse_args():
         "--gt", type=str, default=None,
         help="若有銳利 (Ground Truth) 影像，可指定其路徑，將計算 PSNR/SSIM"
     )
+    parser.add_argument(
+        "--resize", type=int, default=None,
+        help="自動將輸入圖片縮小至最大邊長（例如 512），可避免記憶體爆炸"
+    )
     return parser.parse_args()
 
 def main():
@@ -86,7 +91,12 @@ def main():
 
     # 1. 讀取影像
     print(f"讀取模糊影像: {args.input}")
-    img = load_image(args.input, as_gray=True)
+    img = load_image(args.input, as_gray=False)
+
+    if args.resize:
+        from utils import resize_image
+        print(f"自動縮圖: 最大邊長 {args.resize}")
+        img = resize_and_crop_to_multiple_of_8(img, max_size=args.resize)
 
     # 2. 產生高斯 PSF
     print(f"生成高斯 PSF: 大小={args.psf_size}x{args.psf_size}, sigma={args.psf_sigma}")
@@ -96,6 +106,11 @@ def main():
     if args.method == "wiener":
         print(f"使用 Wiener Filter 去模糊 (K={args.K})")
         deblurred = deblur_wiener(img, psf, K=args.K)
+    elif args.method == "restormer":
+        print(f"使用 Restormer 去模糊")
+        if img.ndim != 3:
+            raise ValueError("Restormer 僅支援彩色影像，請勿使用灰階圖。")
+        deblurred = deblur_restormer(img)
     else:
         print(f"使用 Richardson-Lucy 去模糊 (iterations={args.iterations})")
         deblurred = deblur_rl(img, psf, iterations=args.iterations)
