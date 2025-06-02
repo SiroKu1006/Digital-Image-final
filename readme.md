@@ -64,7 +64,7 @@ Wiener Filter 的雜訊功率比 (noise-to-signal ratio)，通常介於 0.001～
 
 ### Restormer
 ```bash
-python main.py -i data/case4.jpg -o results -m restormer --resize 512
+python main.py -i data/case1.jpg -o results -m restormer --resize 512
 ```
 
 
