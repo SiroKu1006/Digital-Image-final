@@ -40,7 +40,7 @@ def parse_args():
     )
     # Richardson-Lucy 參數
     parser.add_argument(
-        "--iterations", type=int, default=30,
+        "--iterations", type=int, default=100,
         help="Richardson-Lucy 迭代次數，僅對 method='rl' 生效，預設 30"
     )
     # 後處理參數 (可選)

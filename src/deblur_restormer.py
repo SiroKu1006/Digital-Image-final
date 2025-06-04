@@ -14,7 +14,7 @@ def load_restormer_model():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
     # 改為 defocus deblurring 模型路徑
-    model_path = os.path.join('C:/Users/修改這裡/Desktop/Digital-Image-final/src/.cache/restormer/single_image_defocus_deblurring.pth')
+    model_path = os.path.join(r'C:\Users\peipe\OneDrive\桌面\MyCode\Digital-Image-final\src\.cache\restormer\single_image_defocus_deblurring.pth')
     
     if not os.path.exists(model_path):
         print(f"找不到模型檔案：{model_path}")
