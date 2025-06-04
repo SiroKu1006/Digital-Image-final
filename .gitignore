@@ -4,3 +4,4 @@
 *.pptx
 venv/
 Restormer/
+.cache/
