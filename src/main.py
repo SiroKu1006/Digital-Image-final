@@ -1,6 +1,7 @@
 # file: src/main.py
 
 import os
+import cv2
 import argparse
 import numpy as np
 from utils import load_image, save_image, generate_gaussian_psf, resize_and_crop_to_multiple_of_8
@@ -93,6 +94,9 @@ def main():
     print(f"讀取模糊影像: {args.input}")
     img = load_image(args.input, as_gray=False)
 
+    original_size = (img.shape[1], img.shape[0])  # (width, height)
+
+    # 調整影像大小
     if args.resize:
         from utils import resize_image
         print(f"自動縮圖: 最大邊長 {args.resize}")
@@ -129,6 +133,11 @@ def main():
     if args.enhance_edges:
         print(f"後處理: 邊緣增強 (amount={args.enhance_amount}, radius={args.enhance_radius})")
         deblurred = enhance_edges(deblurred, amount=args.enhance_amount, radius=args.enhance_radius)
+
+    # 轉換回原始大小
+    if args.resize:
+        print(f"將影像尺寸從 {deblurred.shape[1]}x{deblurred.shape[0]} 還原為 {original_size[0]}x{original_size[1]}")
+        deblurred = cv2.resize(deblurred, original_size, interpolation=cv2.INTER_CUBIC)
 
     # 5. 儲存結果
     #    組合輸出目錄與檔名
